@@ -40,13 +40,10 @@ header ul li {
     border-color: lightblue;
 }
 
-.hide {
-    display: none;
-}
 
 #questions {
     display: grid;
-    grid-template-columns: repeat(2,auto);
+    grid-template-columns: repeat(1,auto);
 }
 
 .correct {
@@ -67,4 +64,11 @@ header ul li {
     margin: 5px;
     border-color: black;
     font-size: 1.5em;
+}
+
+#scoreList {
+    list-style: none;
+    color: black;
+    font-size: large;
+    padding: 0;
 }

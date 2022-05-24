@@ -1,36 +1,37 @@
 var timeEl = document.getElementById("countdown")
 var timeRemaining = 20
 var startBtn = $("#startQuiz")
-var scoreBtn = $("#goToScores")
+var scoreBtn = $("#scoreBtn")
 var questionsEl = document.getElementById("questions")
 var questionHeader = document.getElementById("questionHeader")
+var scoreList = document.getElementById("scoreList")
 var i = -1
 var btnEl = document.getElementsByClassName("btn")
 var questions = [
-    {question : "dog?",
+    {question : "Which of the following type of variable is visible everywhere in your JavaScript code?",
     answers: [
-        `dog 1`,
-        `dog 2`,
-        `dog 3`,
-        `dog 4`,
+        `Local Variable`,
+        `Total Variable`,
+        `Global Variable`,
+        `All variables are visible everywhere`,
         ],
     correct : "C"
     },
-    {question: `cat?`,
+    {question: `What method allows you to add elements to the end of an array and returns the new length of the array?`,
     answers: [
-        `cat 1`,
-        `cat 2`,
-        `cat 3`,
-        `cat 4`,
+        `append()`,
+        `push()`,
+        `concat()`,
+        `last()`,
         ],
     correct : "B"
     },
-    {question: `monkey?`,
+    {question: `Which of the following can be used to loop a function?`,
     answers: [
-        `monkey 1`,
-        `monkey 2`,
-        `monkey 3`,
-        `monkey 4`,
+        "for (var i=0; i < a.length; i++) {}",
+        `forEach()`,
+        `while() {}`,
+        `All of the above`,
         ],
     correct : "D"
     },
@@ -39,24 +40,31 @@ var questions = [
 var score = 0
 var submitBtn = $("#submit");
 var clearBtn = $("#clear");
+var viewScoresBtn = $("#scoreBtn")
 var highScores = JSON.parse(localStorage.getItem(`highScores`)) || [];
+var scoreString = highScores.map(endScore => { 
+    return `<li class="high-score">${endScore.initials}: ${endScore.score}</li>`;
+        })
+        .join("");
 var maxScores = 5
 
 submitBtn.hide();
 clearBtn.hide();
 
+// scoreList.style.display = "none";
+
 
 startBtn.on("click", countdown)
 startBtn.on("click", startGame)   
 
+// handles timer countdown
 function countdown() {var interval = setInterval(function (){
     timeRemaining--;
     timeEl.innerHTML = `<li>${timeRemaining} seconds remaining</li>`
     if (timeRemaining <= 0){
         clearInterval(interval);
         timeRemaining = 0
-        return;
-        // display score and provide box to enter and submit initials
+        endQuiz();
     } 
     }, 1000)
 }
@@ -65,7 +73,10 @@ function countdown() {var interval = setInterval(function (){
 function startGame() {
     startBtn.hide()
     scoreBtn.hide()
+    clearBtn.hide()
     nextQuestion()
+    scoreList.style.display = "none";
+
 }
 
 console.log(score + `pre`)
@@ -79,27 +90,41 @@ saveScore = e => {
         score: score
     };
     highScores.push(endScore);
-    console.log(highScores);
     highScores.sort( (a,b) => 
         b.score - a.score
     );
     highScores.splice(5);
+    console.log(highScores)
 
-    localStorage.setItem(`highScores`, JSON.stringify(highScores))
-    window.location.assign(`/index.html`)
+    localStorage.setItem(`highScores`, JSON.stringify(highScores));
+    window.location.assign(`/index.html`);
 // show score list and restart button
-    // submitBtn.hide();
     questionHeader.innerHTML = `<h2>Highscores:</h2>`;
-    // questionsEl.innerHTML = `<p>${endScore}</p>`
-    // questionsEl.innerHTML = `<p>${highScores}</p>`
+    scoreList.style.display = "block";
+    
+    console.log(scoreString)
+    scoreList.innerHTML = scoreString
 }
 
+// removes scores from local storage and clears any scores displayed on the page
 function clearScore () {
+    while (scoreList.firstChild) {
+        scoreList.removeChild(scoreList.firstChild);
+    }
     window.localStorage.clear()
-    initials.value = ``
+    // initials.value = ``
+    
 }
 
+// displays up to the 5 highest scores
+function viewScores() {
+    questionHeader.innerHTML = `<h2>Highscores:</h2>`
+    scoreList.innerHTML = scoreString
+    clearBtn.show()
+    viewScoresBtn.hide()
+}
 
+// generates the next question
 function nextQuestion () {
     i++
     // Check if quiz is over befire continuing
@@ -135,7 +160,7 @@ function checkAnswer (event, i) {
 
 
 
-
+// ends quiz, and allows for entering initials for your score
 function endQuiz() {
     questionHeader.innerHTML = `<h2>Quiz over! Your score is ${score}</h2>`;
     questionsEl.innerHTML = `<input type="text" placeholder = "initials" id="initials" name="initials">`
@@ -147,3 +172,4 @@ function endQuiz() {
 
 submitBtn.on("click", saveScore)
 clearBtn.on("click", clearScore)
+viewScoresBtn.on("click", viewScores)
